@@ -124,6 +124,9 @@ class LanguageSwitcher {
         
         // 初始化页面语言
         this.updateLanguage();
+        
+        // 初始化按钮状态和滑动位置
+        this.updateLanguageButtons();
     }
     
     bindLanguageButtons() {
@@ -166,6 +169,8 @@ class LanguageSwitcher {
     
     updateLanguageButtons() {
         const langButtons = document.querySelectorAll('.lang-btn');
+        const languageSwitcher = document.querySelector('.language-switcher');
+        
         langButtons.forEach(button => {
             const lang = button.getAttribute('data-lang');
             if (lang === this.currentLang) {
@@ -174,6 +179,15 @@ class LanguageSwitcher {
                 button.classList.remove('active');
             }
         });
+        
+        // 更新滑动指示器位置
+        if (languageSwitcher) {
+            if (this.currentLang === 'zh') {
+                languageSwitcher.classList.add('slide-right');
+            } else {
+                languageSwitcher.classList.remove('slide-right');
+            }
+        }
     }
 }
 
