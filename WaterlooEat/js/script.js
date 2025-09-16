@@ -1,5 +1,16 @@
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
+    // 加载屏幕功能
+    initLoadingScreen();
+    
+    // 滚动动画功能
+    initScrollAnimations();
+    
+    // 动画特色功能
+    initAnimatedFeatures();
+    
+    // Near Me 功能
+    initNearMeFeature();
     // 导航栏滚动效果
     const navbar = document.querySelector('.navbar');
     const navLinks = document.querySelectorAll('.nav-link');
@@ -323,4 +334,140 @@ function throttle(func, limit) {
             setTimeout(() => inThrottle = false, limit);
         }
     };
+}
+
+// 加载屏幕功能
+function initLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    const progressFill = document.querySelector('.progress-fill');
+    const loadingPercentage = document.querySelector('.loading-percentage');
+    
+    if (!loadingScreen) return;
+    
+    // 添加加载类到body
+    document.body.classList.add('loading');
+    
+    let progress = 0;
+    const loadingInterval = setInterval(() => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        progressFill.style.width = progress + '%';
+        loadingPercentage.textContent = Math.round(progress) + '%';
+        
+        if (progress >= 100) {
+            clearInterval(loadingInterval);
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                document.body.classList.remove('loading');
+            }, 500);
+        }
+    }, 100);
+}
+
+// 滚动动画功能
+function initScrollAnimations() {
+    const animatedElements = document.querySelectorAll('.animate-on-scroll');
+    
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -20px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const delay = entry.target.getAttribute('data-delay') || 0;
+                setTimeout(() => {
+                    entry.target.classList.add('animated');
+                }, delay * 500); // Reduced from 1000ms to 500ms
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+    
+    animatedElements.forEach(element => {
+        observer.observe(element);
+    });
+}
+
+// 动画特色功能
+function initAnimatedFeatures() {
+    const featureItems = document.querySelectorAll('.feature-item');
+    const indicators = document.querySelectorAll('.indicator');
+    let currentIndex = 0;
+    
+    if (featureItems.length === 0) return;
+    
+    // 自动轮播功能
+    function showFeature(index) {
+        featureItems.forEach((item, i) => {
+            item.classList.toggle('active', i === index);
+        });
+        
+        indicators.forEach((indicator, i) => {
+            indicator.classList.toggle('active', i === index);
+        });
+    }
+    
+    // 指示器点击事件
+    indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => {
+            currentIndex = index;
+            showFeature(currentIndex);
+        });
+    });
+    
+    // 自动轮播
+    setInterval(() => {
+        currentIndex = (currentIndex + 1) % featureItems.length;
+        showFeature(currentIndex);
+    }, 4000);
+    
+    // 鼠标悬停暂停轮播
+    const featureContainer = document.querySelector('.animated-features-container');
+    let autoPlayInterval;
+    
+    function startAutoPlay() {
+        autoPlayInterval = setInterval(() => {
+            currentIndex = (currentIndex + 1) % featureItems.length;
+            showFeature(currentIndex);
+        }, 4000);
+    }
+    
+    function stopAutoPlay() {
+        clearInterval(autoPlayInterval);
+    }
+    
+    if (featureContainer) {
+        featureContainer.addEventListener('mouseenter', stopAutoPlay);
+        featureContainer.addEventListener('mouseleave', startAutoPlay);
+        startAutoPlay();
+    }
+}
+
+// Near Me 功能
+function initNearMeFeature() {
+    const nearMeLink = document.getElementById('near-me-link');
+    const nearMeLoading = document.getElementById('near-me-loading');
+    
+    if (!nearMeLink || !nearMeLoading) return;
+    
+    nearMeLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // 显示加载屏幕
+        nearMeLoading.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // 模拟加载时间，然后重定向到 Google Maps
+        setTimeout(() => {
+            // 重定向到 Google Maps Waterloo
+            window.open('https://www.google.com/maps/search/restaurants+near+Waterloo,+ON,+Canada', '_blank');
+            
+            // 隐藏加载屏幕
+            nearMeLoading.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }, 2500); // 2.5秒加载时间
+    });
 }
